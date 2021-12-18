@@ -1,2 +1,2 @@
-# tf-state
+# Terraform State
 Terraform remote state storage
