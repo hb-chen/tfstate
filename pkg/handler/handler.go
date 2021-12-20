@@ -30,9 +30,13 @@ func (h *handler) Get(ctx echo.Context) error {
 	return ctx.Blob(http.StatusOK, echo.MIMEApplicationJSON, d)
 }
 
+// /state/stackId?ID=e4b05a57-e7fd-26a0-76c1-62b4703d95c0
 func (h *handler) Update(ctx echo.Context) error {
-	id := ctx.Param("id")
-	log.Infof("update: %v", id)
+	stackId := ctx.Param("stackId")
+	log.Infof("update stack: %v", stackId)
+
+	id := ctx.QueryParam("ID")
+	log.Infof("update ID: %v", id)
 
 	params, _ := ctx.FormParams()
 	log.Infof("body: %++v", params)
@@ -41,7 +45,7 @@ func (h *handler) Update(ctx echo.Context) error {
 	log.Infof("lock: %v", string(b))
 	ctx.Request().Body.Close()
 
-	err := h.state.Update(id, b)
+	err := h.state.Update(stackId, b)
 	if err != nil {
 		return err
 	}
@@ -73,8 +77,8 @@ type LockBody struct {
 // 200: OK for success
 
 func (h *handler) Lock(ctx echo.Context) error {
-	id := ctx.Param("id")
-	log.Infof("update: %v", id)
+	stackId := ctx.Param("stackId")
+	log.Infof("local stack: %v", stackId)
 
 	req := &LockBody{}
 	if err := ctx.Bind(req); err != nil {
@@ -82,7 +86,7 @@ func (h *handler) Lock(ctx echo.Context) error {
 	}
 
 	// TODO token validate
-	if err := h.state.Lock(id, req.Id); err != nil {
+	if err := h.state.Lock(stackId, req.Id); err != nil {
 		return err
 	}
 
@@ -90,8 +94,8 @@ func (h *handler) Lock(ctx echo.Context) error {
 }
 
 func (h *handler) Unlock(ctx echo.Context) error {
-	id := ctx.Param("id")
-	log.Infof("update: %v", id)
+	stackId := ctx.Param("stackId")
+	log.Infof("unlock stack: %v", stackId)
 
 	req := &LockBody{}
 	if err := ctx.Bind(req); err != nil {
@@ -99,7 +103,7 @@ func (h *handler) Unlock(ctx echo.Context) error {
 	}
 
 	// TODO token validate
-	if err := h.state.Unlock(id, req.Id); err != nil {
+	if err := h.state.Unlock(stackId, req.Id); err != nil {
 		return err
 	}
 

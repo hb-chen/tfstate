@@ -20,21 +20,21 @@ func main() {
 
 	e.Logger.SetLevel(log.DEBUG)
 
-	// e.Use(middleware.BasicAuth(func(u string, p string, context echo.Context) (b bool, err error) {
-	// 	log.Infof("basic auth: %v, %v", u, p)
-	// 	if u == p {
-	// 		return true, nil
-	// 	}
-	//
-	// 	return false, nil
-	// }))
+	e.Use(middleware.BasicAuth(func(u string, p string, context echo.Context) (b bool, err error) {
+		// TODO
+		log.Infof("basic auth: %v, %v", u, p)
+		if u == p {
+			return true, nil
+		}
 
-	g := e.Group("/state/:id")
+		return false, nil
+	}))
+
+	g := e.Group("/state/:stackId")
 
 	state := handler.NewHandler()
 	g.GET("", state.Get)
 	// state update
-	// /state/idxxx?ID=e4b05a57-e7fd-26a0-76c1-62b4703d95c0
 	g.POST("", state.Update)
 
 	// state lock
